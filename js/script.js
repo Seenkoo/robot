@@ -48,7 +48,6 @@ $(document).ready(function(){
 					.toggleClass("right")
 					.next()
 					.toggleClass("left");
-					return true;
 				}
 				break;
 			case "left":
@@ -57,7 +56,6 @@ $(document).ready(function(){
 					.toggleClass("left")
 					.prev()
 					.toggleClass("right");
-					return true;
 				}
 				break;
 			case "top":
@@ -66,21 +64,20 @@ $(document).ready(function(){
 					.toggleClass("top")
 					.parent().prev().children("td:eq("+$elementIndex+")")
 					.toggleClass("bottom");
-					return true;
 				}
 				break;
 			case "bottom":
-				if( $element.parent().index() != 5 ){ 
+				if( $element.parent().index() != 5 ){
 					$element
 					.toggleClass("bottom")
 					.parent().next().children("td:eq("+$elementIndex+")")
 					.toggleClass("top");
-					return true;
 				}
 				break;
 			default:
 				break;
 		}
+		return true;
 	}
 	// End create obstacle
 
@@ -240,11 +237,8 @@ $(document).ready(function(){
 	// Begin Random Obstacles Generate
 	$(document).on("click", "#randomize", function(){
 		resetField(true);
-
 		var obstaclesCounter = 0;
-		var overload = 0;
-		while(obstaclesCounter <= 5 && overload <= 10){
-
+		while(obstaclesCounter < 5 && $(".main td:not(.right.left.top.bottom)").length != 0){
 			var obstaclePos = Math.floor(Math.random() * (4));
 			switch( obstaclePos ){
 				case 0:
@@ -262,27 +256,33 @@ $(document).ready(function(){
 				default:
 					break;
 			}
-
-			var selectCellNumber = Math.floor(Math.random() * ($(".main td:not(."+obstacle+")").length));
-			var $selectCellObject = $(".main td:not(."+obstacle+")").eq(selectCellIndex);
-
-			var selectCellIndex = $selectCellObject.index();
+			var notClutteredCount = $(".main td:not(."+obstacle+")").length;
+			if(notClutteredCount == 0){
+				continue;
+			}
+			var selectCellEQ = Math.floor(Math.random() * notClutteredCount);
+			var $selectCellObject = $(".main td:not(."+obstacle+")").eq(selectCellEQ);
+			selectCellIndex = $selectCellObject.index();
 
 			if(createObstacle(obstacle, $selectCellObject, selectCellIndex)){
 				obstaclesCounter++;
 			}
-			overload++;
 		}
 	});
 	// End Random Obstacles Generate
 
 	// Begin Reset
-	$(document).on("click", "#reset", function(){
+	$(document).on("click", ".reset", function(){
 		resetField(true);
-		$(".main table").html($(".reset table").html());
-		$(".options hr").nextAll().remove();
-		$(".options").append($(".resetalgo").html());
-		window.algorithmInputs = 2;
+		if($(this).hasClass("reset_field")){
+			$(".main table").html($(".reset table").html());
+		}
+		/*if($(this).hasClass("reset_algo")){
+			$(".options hr").nextAll().remove();
+			$(".options").append($(".resetalgo").html());
+			window.algorithmInputs = 2;
+		}*/
+		// If uncommenting this, uncomment button in index.html
 	});
 	// End Reset
 
