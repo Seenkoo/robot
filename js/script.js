@@ -317,14 +317,15 @@ $(document).ready(function(){
 
  	// Begin remove condition from algorithm
  	$(document).on("click", "img.lessalgo", function(){
+ 		$(this).prop("disabled", true);
  		resetField(true);
  		var id = parseInt($(this).attr("data-id"));
  		var $this = $(this).parent();
  		window.algorithmInputs--;
- 		$this.slideUp(500);
+ 		$this.slideUp(200);
  		setTimeout(function(){
  			$this.remove();
- 		}, 500);
+ 		}, 200);
  		$this.nextAll().find("*[data-id]").addBack().each(function(){
  			$(this).attr("data-id", $(this).attr("data-id") - 1);
  			if($(this).hasClass("algocounter")){
