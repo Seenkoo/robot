@@ -1,0 +1,656 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Robot</title>
+		<script type="text/javascript" src="js/jquery.js"></script>
+		<script type="text/javascript" src="js/script.js"></script>
+		<style type="text/css">
+			.content{
+				width: 900px;
+				margin: auto;
+				text-align: center;
+				-moz-user-select: none;
+				-webkit-user-select: none;
+			}
+			.main{
+				float: left;
+				width: 400px;
+			}
+			.options{
+				float: right;
+				width: 500px;
+			}
+			.options select{
+				/*max-width: 90px;*/
+				border-radius: 3px;
+				font-size: 15px;
+				outline: none;
+			}
+			.options select::-webkit-scrollbar{
+				display: none;
+			}
+			.options .algorithm{
+				position: relative;
+				padding: 10px 0px 10px 0px;
+				border: 1px dashed black;
+				border-radius: 5px;
+			}
+			.options .algorithm:not(:first-child){
+				margin-top: 5px;
+			}
+			.main table{
+				margin: auto;
+				padding: 10px 0px 10px 0px;
+				border-collapse: separate;
+				border-spacing: 0;
+			}
+			.algorithm table{
+				margin: auto;
+			}
+			.main table td{
+				width: 60px;
+				height: 60px;
+				border: 1px dotted black;
+				text-align: center;
+				font-size: 26px;
+			}
+			.main table td:hover{
+				cursor: pointer;
+			}
+			.main table tr:first-child td{
+				border-top: 4px solid black !important;
+			}
+			.main table tr td:first-child{
+				border-left: 4px solid black !important;
+			}
+			.main table tr td:last-child{
+				border-right: 4px solid black !important;
+			}
+			.main table tr:last-child td{
+				border-bottom: 4px solid black !important;
+			}
+			.right{
+				border-right: 2px solid black !important;
+			}
+			.left{
+				border-left: 2px solid black !important;
+			}
+			.top{
+				border-top: 2px solid black !important;
+			}
+			.bottom{
+				border-bottom: 2px solid black !important;
+			}
+			button{
+				width: 120px;
+				height: 30px;
+				border-radius: 5px;
+				outline: none;
+			}
+			.algorithm img.lessalgo{
+				position: absolute;
+				top: 1px;
+				right: 1px;
+				border-radius: 7px;
+				cursor: pointer;
+			}
+			.path{
+				background-color: #DDDDDD !important;
+			}
+			.start{
+				background-color: #FFFFFF !important;
+			}
+			.visual{
+				background-color: #DDDDDD;
+			}
+			li{
+				margin-top: 5px;
+			}
+			div.hide span{
+				display: none;
+			}
+			div.hide:hover span{
+				display: inline;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="content">
+			<div class="main">
+				<div class="menu">
+					<button id="ege" title="Загрузить вариант задачи из ЕГЭ">Задача из ЕГЭ</button>
+					<button id="randomize" title="Добавить пять случайных препятствий на поле">+5 препятствий</button>
+					<button id="reset" title="Сбросить все препятствия и алгоритм">Сбросить все</button>
+				</div>
+				<table cellpadding="0">
+					<tr>
+						<td class="top left"></td>
+						<td class="top"></td>
+						<td class="top"></td>
+						<td class="top"></td>
+						<td class="top"></td>
+						<td class="top right"></td>
+					</tr>
+					<tr>
+						<td class="left"></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="right"></td>
+					</tr>
+					<tr>
+						<td class="left"></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="right"></td>
+					</tr>
+					<tr>
+						<td class="left"></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="right"></td>
+					</tr>
+					<tr>
+						<td class="left"></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="right"></td>
+					</tr>
+					<tr>
+						<td class="bottom left"></td>
+						<td class="bottom"></td>
+						<td class="bottom"></td>
+						<td class="bottom"></td>
+						<td class="bottom"></td>
+						<td class="bottom right"></td>
+					</tr>
+				</table>
+				<ol style="text-align: left;">
+					<li>Если робот ни разу не врежется в стену в процессе выполнения алгоритма, его стартовая позиция окрасится в зеленый цвет.</li>
+					<li>Препятствия можно установить, кликнув левой кнопкой мыши в место установки.</li>
+					<li>После выполнения алгоритма, клики мыши по ячейкам включают режим показа информации о пути робота в процессе выполнения алгоритма.</li>
+					<div class="hide">
+						<li class="hide"><span>???????</span></li>
+						<li class="hide"><span>PROFIT!</span></li>
+					</div>
+				</ol>
+			</div>
+			<div class="options">
+				<div class="menu">
+					<button id="release" title="Войти в режим добавления препятствий" style="display:none;">Изменить</button>
+					<button id="start" title="Запустить робота">Запуск!</button>
+					<button class="morealgo" data-type="while" title="Добавить WHILE цикл к алгоритму">Еще WHILE</button>
+					<button class="morealgo" data-type="if" title="Добавить IF условие к алгоритму">Еще IF</button>
+				</div>
+				<hr>
+				<div class="algorithm" data-id="1">
+					<table>
+					<tr>
+						<td>
+							<strong class="algocounter" data-id="1">1.</strong>
+							<strong>ПОКА &lt; </strong>
+						</td>
+						<td>
+							<select size="4" class="condition" data-type="while">
+								<option value="top" selected>сверху</option>
+								<option value="right">справа</option>
+								<option value="bottom">снизу</option>
+								<option value="left">слева</option>
+							</select>
+							<select size="2" class="isfree">
+								<option value="" disabled></option>
+								<option value="true" selected>свободно</option>
+								<option value="false">занято</option>
+							</select>
+						</td>
+						<td>
+							<strong>&gt;</strong>
+						</td>
+						<td>
+							<select size="4" class="do">
+								<option value="top" selected>вверх</option>
+								<option value="right">вправо</option>
+								<option value="bottom">вниз</option>
+								<option value="left">влево</option>
+							</select>
+						</td>
+					</tr>
+					</table>
+					<img class="lessalgo" src="img/minus.png" title="Удалить этот блок алгоритма" data-id="1">
+				</div>
+				<div class="algorithm" data-id="2">
+					<table>
+					<tr>
+						<td>
+							<strong class="algocounter" data-id="2">2.</strong>
+							<strong>ЕСЛИ &lt; </strong>
+						</td>
+						<td>
+							<select size="4" class="condition" data-type="if">
+								<option value="top">сверху</option>
+								<option value="right">справа</option>
+								<option value="bottom">снизу</option>
+								<option value="left" selected>слева</option>
+							</select>
+							<select size="2" class="isfree">
+								<option value="" disabled></option>
+								<option value="true" selected>свободно</option>
+								<option value="false">занято</option>
+							</select>
+						</td>
+						<td>
+							<strong>&gt;</strong>
+						</td>
+						<td>
+							<select size="4" class="do">
+								<option value="top">вверх</option>
+								<option value="right" selected>вправо</option>
+								<option value="bottom">вниз</option>
+								<option value="left">влево</option>
+							</select>
+						</td>
+					</tr>
+					</table>
+					<img class="lessalgo" src="img/minus.png" title="Удалить этот блок алгоритма" data-id="2">
+				</div>
+			</div>
+		</div>
+		<div class="templates" style="display:none;">
+			<div class="ege_table" style="display:none;">
+				<table cellpadding="0">
+					<tr>
+						<td class="top left"></td>
+						<td class="top bottom"></td>
+						<td class="top"></td>
+						<td class="top bottom"></td>
+						<td class="top bottom"></td>
+						<td class="top right"></td>
+					</tr>
+					<tr>
+						<td class="left bottom"></td>
+						<td class="top right"></td>
+						<td class="left"></td>
+						<td class="top right"></td>
+						<td class="top right left"></td>
+						<td class="left right"></td>
+					</tr>
+					<tr>
+						<td class="left top"></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="right"></td>
+					</tr>
+					<tr>
+						<td class="left right"></td>
+						<td class="left bottom"></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="right"></td>
+					</tr>
+					<tr>
+						<td class="left right"></td>
+						<td class="left bottom top"></td>
+						<td></td>
+						<td class="right bottom"></td>
+						<td class="right left bottom"></td>
+						<td class="right left"></td>
+					</tr>
+					<tr>
+						<td class="bottom left"></td>
+						<td class="bottom top"></td>
+						<td class="bottom"></td>
+						<td class="bottom top"></td>
+						<td class="bottom top"></td>
+						<td class="bottom right"></td>
+					</tr>
+				</table>
+			</div>
+			<div class="ege_algo" style="display:none;">
+				<div class="algorithm" data-id="1">
+					<table>
+					<tr>
+						<td>
+							<strong class="algocounter" data-id="1">1.</strong>
+							<strong>ПОКА &lt; </strong>
+						</td>
+						<td>
+							<select size="4" class="condition" data-type="while">
+								<option value="top">сверху</option>
+								<option value="right" selected>справа</option>
+								<option value="bottom">снизу</option>
+								<option value="left">слева</option>
+							</select>
+							<select size="2" class="isfree">
+								<option value="" disabled></option>
+								<option value="true" selected>свободно</option>
+								<option value="false">занято</option>
+							</select>
+						</td>
+						<td>
+							<strong>&gt;</strong>
+						</td>
+						<td>
+							<select size="4" class="do">
+								<option value="top">вверх</option>
+								<option value="right">вправо</option>
+								<option value="bottom" selected>вниз</option>
+								<option value="left">влево</option>
+							</select>
+						</td>
+					</tr>
+					</table>
+					<img class="lessalgo" src="img/minus.png" title="Удалить этот блок алгоритма" data-id="1">
+				</div>
+				<div class="algorithm" data-id="2">
+					<table>
+					<tr>
+						<td>
+							<strong class="algocounter" data-id="2">2.</strong>
+							<strong>ПОКА &lt; </strong>
+						</td>
+						<td>
+							<select size="4" class="condition" data-type="while">
+								<option value="top">сверху</option>
+								<option value="right">справа</option>
+								<option value="bottom" selected>снизу</option>
+								<option value="left">слева</option>
+							</select>
+							<select size="2" class="isfree">
+								<option value="" disabled></option>
+								<option value="true" selected>свободно</option>
+								<option value="false">занято</option>
+							</select>
+						</td>
+						<td>
+							<strong>&gt;</strong>
+						</td>
+						<td>
+							<select size="4" class="do">
+								<option value="top">вверх</option>
+								<option value="right">вправо</option>
+								<option value="bottom">вниз</option>
+								<option value="left" selected>влево</option>
+							</select>
+						</td>
+					</tr>
+					</table>
+					<img class="lessalgo" src="img/minus.png" title="Удалить этот блок алгоритма" data-id="2">
+				</div>
+				<div class="algorithm" data-id="3">
+					<table>
+					<tr>
+						<td>
+							<strong class="algocounter" data-id="3">3.</strong>
+							<strong>ПОКА &lt; </strong>
+						</td>
+						<td>
+							<select size="4" class="condition" data-type="while">
+								<option value="top">сверху</option>
+								<option value="right">справа</option>
+								<option value="bottom">снизу</option>
+								<option value="left" selected>слева</option>
+							</select>
+							<select size="2" class="isfree">
+								<option value="" disabled></option>
+								<option value="true" selected>свободно</option>
+								<option value="false">занято</option>
+							</select>
+						</td>
+						<td>
+							<strong>&gt;</strong>
+						</td>
+						<td>
+							<select size="4" class="do">
+								<option value="top" selected>вверх</option>
+								<option value="right">вправо</option>
+								<option value="bottom">вниз</option>
+								<option value="left">влево</option>
+							</select>
+						</td>
+					</tr>
+					</table>
+					<img class="lessalgo" src="img/minus.png" title="Удалить этот блок алгоритма" data-id="3">
+				</div>
+				<div class="algorithm" data-id="4">
+					<table>
+					</tr>
+						<td>
+							<strong class="algocounter" data-id="4">4.</strong>
+							<strong>ПОКА &lt; </strong>
+						</td>
+						<td>
+							<select size="4" class="condition" data-type="while">
+								<option value="top" selected>сверху</option>
+								<option value="right">справа</option>
+								<option value="bottom">снизу</option>
+								<option value="left">слева</option>
+							</select>
+							<select size="2" class="isfree">
+								<option value="" disabled></option>
+								<option value="true" selected>свободно</option>
+								<option value="false">занято</option>
+							</select>
+						</td>
+						<td>
+							<strong>&gt;</strong>
+						</td>
+						<td>
+							<select size="4" class="do">
+								<option value="top">вверх</option>
+								<option value="right" selected>вправо</option>
+								<option value="bottom">вниз</option>
+								<option value="left">влево</option>
+							</select>
+						</td>
+					</tr>
+					</table>
+					<img class="lessalgo" src="img/minus.png" title="Удалить этот блок алгоритма" data-id="4">
+				</div>
+			</div>
+			<div class="reset" style="display:none;">
+				<table cellpadding="0">
+					<tr>
+						<td class="top left"></td>
+						<td class="top"></td>
+						<td class="top"></td>
+						<td class="top"></td>
+						<td class="top"></td>
+						<td class="top right"></td>
+					</tr>
+					<tr>
+						<td class="left"></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="right"></td>
+					</tr>
+					<tr>
+						<td class="left"></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="right"></td>
+					</tr>
+					<tr>
+						<td class="left"></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="right"></td>
+					</tr>
+					<tr>
+						<td class="left"></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td class="right"></td>
+					</tr>
+					<tr>
+						<td class="bottom left"></td>
+						<td class="bottom"></td>
+						<td class="bottom"></td>
+						<td class="bottom"></td>
+						<td class="bottom"></td>
+						<td class="bottom right"></td>
+					</tr>
+				</table>
+			</div>
+			<div class="resetalgo" style="display:none;">
+				<div class="algorithm" data-id="1">
+					<table>
+					<tr>
+						<td>
+							<strong class="algocounter" data-id="1">1.</strong>
+							<strong>ПОКА &lt; </strong>
+						</td>
+						<td>
+							<select size="4" class="condition" data-type="while">
+								<option value="top" selected>сверху</option>
+								<option value="right">справа</option>
+								<option value="bottom">снизу</option>
+								<option value="left">слева</option>
+							</select>
+							<select size="2" class="isfree">
+								<option value="" disabled></option>
+								<option value="true" selected>свободно</option>
+								<option value="false">занято</option>
+							</select>
+						</td>
+						<td>
+							<strong>&gt;</strong>
+						</td>
+						<td>
+							<select size="4" class="do">
+								<option value="top" selected>вверх</option>
+								<option value="right">вправо</option>
+								<option value="bottom">вниз</option>
+								<option value="left">влево</option>
+							</select>
+						</td>
+					</tr>
+					</table>
+					<img class="lessalgo" src="img/minus.png" title="Удалить этот блок алгоритма" data-id="1">
+				</div>
+				<div class="algorithm" data-id="2">
+					<table>
+					<tr>
+						<td>
+							<strong class="algocounter" data-id="2">2.</strong>
+							<strong>ЕСЛИ &lt; </strong>
+						</td>
+						<td>
+							<select size="4" class="condition" data-type="if">
+								<option value="top">сверху</option>
+								<option value="right">справа</option>
+								<option value="bottom">снизу</option>
+								<option value="left" selected>слева</option>
+							</select>
+							<select size="2" class="isfree">
+								<option value="" disabled></option>
+								<option value="true" selected>свободно</option>
+								<option value="false">занято</option>
+							</select>
+						</td>
+						<td>
+							<strong>&gt;</strong>
+						</td>
+						<td>
+							<select size="4" class="do">
+								<option value="top">вверх</option>
+								<option value="right" selected>вправо</option>
+								<option value="bottom">вниз</option>
+								<option value="left">влево</option>
+							</select>
+						</td>
+					</tr>
+					</table>
+					<img class="lessalgo" src="img/minus.png" title="Удалить этот блок алгоритма" data-id="2">
+				</div>
+			</div>
+			<div class="morealgo_while" style="display:none;">
+				<table>
+				<tr>
+					<td>
+						<strong class="algocounter" data-id=""></strong>
+						<strong>ПОКА &lt; </strong>
+					</td>
+					<td>
+						<select size="4" class="condition" data-type="while">
+							<option value="top" selected>сверху</option>
+							<option value="right">справа</option>
+							<option value="bottom">снизу</option>
+							<option value="left">слева</option>
+						</select>
+						<select size="2" class="isfree">
+							<option value="" disabled></option>
+							<option value="true" selected>свободно</option>
+							<option value="false">занято</option>
+						</select>
+					</td>
+					<td>
+						<strong>&gt;</strong>
+					</td>
+					<td>
+						<select size="4" class="do">
+							<option value="top" selected>вверх</option>
+							<option value="right">вправо</option>
+							<option value="bottom">вниз</option>
+							<option value="left">влево</option>
+						</select>
+					</td>
+				</tr>
+				</table>
+				<img class="lessalgo" src="img/minus.png" title="Удалить этот блок алгоритма" data-id="">
+			</div>
+			<div class="morealgo_if" style="display:none;">
+				<table>
+				<tr>
+					<td>
+						<strong class="algocounter" data-id=""></strong>
+						<strong>ЕСЛИ &lt; </strong>
+					</td>
+					<td>
+						<select size="4" class="condition" data-type="if">
+							<option value="top" selected>сверху</option>
+							<option value="right">справа</option>
+							<option value="bottom">снизу</option>
+							<option value="left">слева</option>
+						</select>
+						<select size="2" class="isfree">
+							<option value="" disabled></option>
+							<option value="true" selected>свободно</option>
+							<option value="false">занято</option>
+						</select>
+					</td>
+					<td>
+						<strong>&gt;</strong>
+					</td>
+					<td>
+						<select size="4" class="do">
+							<option value="top" selected>вверх</option>
+							<option value="right">вправо</option>
+							<option value="bottom">вниз</option>
+							<option value="left">влево</option>
+						</select>
+					</td>
+				</tr>
+				</table>
+				<img class="lessalgo" src="img/minus.png" title="Удалить этот блок алгоритма" data-id="">
+			</div>
+		</div>
+	</body>
+</html>
