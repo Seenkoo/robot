@@ -169,18 +169,19 @@ $(document).ready(function(){
 	// Begin Obstacles user create & path showing
 	$(document).on("click", ".main td", function( e ){
 		if( $(this).hasClass("start") ){
-			$(".path,.start").removeClass("path start").html("");
-			return
+			$(".path,.start").mouseleave().unbind("mouseenter mouseleave").removeClass("path start").html("");
+			return;
 		}
 		if( window.tested ){
 			resetField(false);
 			$(this).addClass("start");
 			var algorithm = createAlgo();
 			if(!algorithm){
-				return
+				return;
 			}
 			testCells( algorithm, $(this) );
-			return
+			$(this).mouseenter();
+			return;
 		}
 		var Xcoord = e.offsetX;
 		var Ycoord = e.offsetY;
