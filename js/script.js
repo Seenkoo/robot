@@ -1,3 +1,7 @@
+// ToDo:
+// Визуализация алгоритма: перенести ховер-эвент с ячейки таблицы на спан с шагом
+// Сохранение своих пресетов алгоритма и возможность их подгрузки
+// Меню для загрузки заданий ЕГЭ
 $(document).ready(function(){
 	// Begin reset
 		function resetField( resetTested ) {
@@ -183,8 +187,8 @@ $(document).ready(function(){
 			$(this).mouseenter();
 			return;
 		}
-		var Xcoord = e.offsetX;
-		var Ycoord = e.offsetY;
+		var Xcoord = (e.offsetX || e.clientX - $(e.target).offset().left);
+		var Ycoord = (e.offsetY || e.clientY - $(e.target).offset().top);
 		var obstaclesArr = [];
 
 		if( Xcoord > 45 ){
@@ -197,9 +201,7 @@ $(document).ready(function(){
 		}else if ( Ycoord < 5 ){
 			obstaclesArr.push("top");
 		}
-
 		if(obstaclesArr != ''){
-
 			var $targetedElement = $(this);
 			var $targetedElementIndex = e.target.cellIndex;
 
